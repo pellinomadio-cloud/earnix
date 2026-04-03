@@ -14,7 +14,7 @@ const testimonyTemplates = [
   "Just received my bonus! Earnix9ja is amazing.",
   "The VIP upgrade is totally worth it. Grant processed!",
   "Finally a platform that actually pays daily rewards.",
-  "Referral program is legit. My limit increased!",
+  "The games are so fun and I'm earning too!",
   "Airtime purchase was instant. Faster than my bank.",
   "Used business funds to restock my shop. Game changer!",
   "Withdrawal to my account was lightning fast. 10/10.",
