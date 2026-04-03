@@ -66,6 +66,7 @@ export interface User {
   lastTelegramClaim2Timestamp?: number;
   dailyQuizCount?: number;
   lastQuizTimestamp?: number;
+  hasPlayedWelcomeVoice?: boolean;
 }
 
 export interface Plan {

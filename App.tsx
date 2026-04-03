@@ -35,6 +35,9 @@ import NotificationFeed from './components/NotificationFeed';
 import Loan from './components/Loan';
 import { Icons } from './components/Icons';
 import { User, Plan, Transaction, RewardStatus } from './types';
+import { GoogleGenAI, Modality } from "@google/genai";
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
 const DEFAULT_NOTIFICATION_PREFERENCES = {
   withdrawals: true,
@@ -202,6 +205,62 @@ const App: React.FC = () => {
   const [taskMode, setTaskMode] = useState<'quiz' | 'telegram' | 'all'>('all');
   const [showReferralModal, setShowReferralModal] = useState(false);
 
+  useEffect(() => {
+    const playWelcomeVoice = async () => {
+      if (user && user.hasPlayedWelcomeVoice === false && currentView === 'dashboard') {
+        try {
+          const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash-preview-tts",
+            contents: [{ parts: [{ text: 'Say cheerfully: welcome to earnix9ja, kindly notes that you can play games to earn, click the rewards button to earn rewards, you can withdraw to any bank as long as you subscribed, thanks for joining earnix9ja' }] }],
+            config: {
+              responseModalities: [Modality.AUDIO],
+              speechConfig: {
+                voiceConfig: {
+                  prebuiltVoiceConfig: { voiceName: 'Kore' },
+                },
+              },
+            },
+          });
+
+          const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+          if (base64Audio) {
+            const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+            const binaryString = window.atob(base64Audio);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+              bytes[i] = binaryString.charCodeAt(i);
+            }
+            const pcmData = new Int16Array(bytes.buffer);
+            const float32Data = new Float32Array(pcmData.length);
+            for (let i = 0; i < pcmData.length; i++) {
+              float32Data[i] = pcmData[i] / 32768;
+            }
+            const buffer = audioContext.createBuffer(1, float32Data.length, 24000);
+            buffer.getChannelData(0).set(float32Data);
+            const source = audioContext.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioContext.destination);
+            source.start();
+
+            // Update user to mark voice as played
+            const updatedUser = { ...user, hasPlayedWelcomeVoice: true };
+            setUser(updatedUser);
+            saveUserToStorage(updatedUser);
+          }
+        } catch (error) {
+          console.error("Error playing welcome voice:", error);
+          // Still mark as played to avoid repeated failures
+          const updatedUser = { ...user, hasPlayedWelcomeVoice: true };
+          setUser(updatedUser);
+          saveUserToStorage(updatedUser);
+        }
+      }
+    };
+
+    playWelcomeVoice();
+  }, [user, currentView]);
+
   // --- DEVICE BACK BUTTON HANDLING ---
   const handleBack = useCallback(() => {
     if (activeTab === 'subscribe_payment') {
@@ -264,7 +323,8 @@ const App: React.FC = () => {
       rewardStatus: { currentDay: 1, lastClaimedTimestamp: 0 },
       lastTelegramClaimTimestamp: 0,
       lastTelegramClaim2Timestamp: 0,
-      notificationPreferences: { ...DEFAULT_NOTIFICATION_PREFERENCES }
+      notificationPreferences: { ...DEFAULT_NOTIFICATION_PREFERENCES },
+      hasPlayedWelcomeVoice: false
     };
     saveUserToStorage(newUser);
     localStorage.setItem('earnix9ja_active_session', email.toLowerCase());
