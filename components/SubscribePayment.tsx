@@ -16,7 +16,7 @@ const SubscribePayment: React.FC<SubscribePaymentProps> = ({ plan, userEmail, on
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const accountNumber = "6010822388";
+  const accountNumber = "2423673964";
 
   const handleCopy = () => {
     navigator.clipboard.writeText(accountNumber);
@@ -136,11 +136,11 @@ const SubscribePayment: React.FC<SubscribePaymentProps> = ({ plan, userEmail, on
             </div>
             <div className="flex justify-between items-center border-b border-gray-800 pb-2">
               <span className="text-xs text-gray-500 uppercase font-bold">Bank Name</span>
-              <span className="text-lg font-black text-gold uppercase">BestStar MFB</span>
+              <span className="text-lg font-black text-gold uppercase">PAGA</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-xs text-gray-500 uppercase font-bold">Account Name</span>
-              <span className="text-sm font-black text-white uppercase">EARNIX9JA - by oluwatosin</span>
+              <span className="text-sm font-black text-white uppercase">OLUWATOSIN OLIDO</span>
             </div>
           </div>
           
