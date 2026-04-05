@@ -33,6 +33,7 @@ import UpgradePayment from './components/UpgradePayment';
 import BusinessHub from './components/BusinessHub';
 import NotificationFeed from './components/NotificationFeed';
 import Loan from './components/Loan';
+import AppUpdated from './components/AppUpdated';
 import { Icons } from './components/Icons';
 import { User, Plan, Transaction, RewardStatus } from './types';
 import { GoogleGenAI, Modality } from "@google/genai";
@@ -45,6 +46,8 @@ const DEFAULT_NOTIFICATION_PREFERENCES = {
   airtime: true,
   rewards: true
 };
+
+const IS_MAINTENANCE = true;
 
 const App: React.FC = () => {
   // Global Time State for Deactivation & Subscription Logic
@@ -667,6 +670,10 @@ const App: React.FC = () => {
     const interval = setInterval(() => setShowInviteAd(true), 60000);
     return () => clearInterval(interval);
   }, [currentView]);
+
+  if (IS_MAINTENANCE) {
+    return <AppUpdated />;
+  }
 
   if (currentView === 'register') return <div className={darkMode ? 'dark' : ''}><Register onRegister={handleRegister} onSwitchToLogin={() => setCurrentView('login')} /></div>;
   if (currentView === 'login') return <div className={darkMode ? 'dark' : ''}><Login onLogin={handleLogin} onSwitchToRegister={() => setCurrentView('register')} /></div>;
